@@ -1,33 +1,37 @@
 #!/usr/bin/python3
 """
-script to upload web static
+a  script to deploy web_static to 
+my servers
 """
-from fabric.api import env, put, run, sudo
-import os
+
+from fabric.api import run, env, put
+import os.path
 
 env.hosts = ['18.234.168.198', '35.168.2.70']
-env.user = 'ubuntu'
 env.key_filename = '~/.ssh/school'
+env.user = 'ubuntu'
 
 def do_deploy(archive_path):
-    if not os.path.exists(archive_path):
+    """
+    upload and decompress the archive_file
+    """
+    
+    if not os.path.isfile(archive_path):
         return False
-
+    compressed_file = archive_path.split("/")[-1]
+    remove_extension = compressed_file.split(".")[0]
+    
     try:
-        put(archive_path, '/tmp/')
-        
-        archive_filename = os.path.basename(archive_path)
-        archive_foldername = archive_filename.split('.')[0]
-        run('mkdir -p /data/web_static/releases/{}'.format(archive_foldername))
-        run('tar -xzf /tmp/{} -C /data/web_static/releases/{}/'.format(archive_filename, archive_foldername))
-        
-        run('rm /tmp/{}'.format(archive_filename))
-        run('sudo rm -f /data/web_static/current')
-        
-        run('sudo ln -s /data/web_static/releases/{}/ /data/web_static/current'.format(archive_foldername))
-
-        print("New version deployed!")
-        return True
-    except:
-        return False
-
+       uncompress_to = "/data/web_static/releases/{}/".format(remove_extension)
+       sym_link = "/data/web_static/current"
+       put(archive_path, "/tmp/")
+       run("sudo mkdir -p {}".format(uncompress_to))
+       run("sudo tar -xvzf /tmp/{} -C {}".format(compressed_file, uncompresss_to))
+       run("sudo rm /tmp/{}".format(compressed_file))
+       run("sudo mv {}/web_static/* {}".format(uncompress_to, uncompress_to))
+       run("sudo rm -rf {}/web_static".format(uncompress_to))
+       run("sudo rm -rf /data/web_static/current")
+       run("sudo ln -sf {} {}".format(uncompress_to, sym_link))
+       return True
+    except Exception as e:
+       return False
