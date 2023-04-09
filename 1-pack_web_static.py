@@ -10,6 +10,7 @@ def do_pack():
     """
     Generate a .tgz archive from contents of web_static folder
     """
+    local("mkdir -p versions")
     current_time = datetime.now().strftime("%Y%M%d%H%M%S")
     try:
         local("mkdir -p versions")
