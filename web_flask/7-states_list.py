@@ -1,4 +1,4 @@
-#!/usr/bash/env python
+#!/usr/bin/python3
 """
 Script to start flask aplication
 list all states on html
